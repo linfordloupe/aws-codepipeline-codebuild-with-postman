@@ -21,6 +21,11 @@ Parameters:
     Description: bucket containing project artifacts e.g. postman config files, etc.
     MinLength: 1
     MaxLength: 100
+    GitHubRepositoryName2:
+      Type: String
+      Description: GitHub repository name for readyapi project.
+      MinLength: 1
+      MaxLength: 100
 
 Resources:
 
@@ -247,7 +252,49 @@ Resources:
           Value:
             Fn::Sub: ${AWS::StackName}-newman-project
 
+  #code build - api testing using Newman to execute Postman test def (see buildspec.yml)
+  RestAssuredCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name:
+        Fn::Sub: ${AWS::StackName}-readyapi-project
+      Description: CodeBuild Project using maven cli to execute postman tests
+      ServiceRole:
+        Fn::GetAtt: [ CodeBuildServiceRole, Arn ]
+      Artifacts:
+        Type: S3
+        Location:
+          Ref: CodePipelineArtifactBucket
+        Name:
+          Fn::Sub: ${AWS::StackName}-readyapi-project
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:2.0
+        EnvironmentVariables:
+          - Name: S3_BUCKET
+            Type: PLAINTEXT
+            Value:
+              Fn::Sub: ${BucketRoot}
+      Source:
+        Location: !Join
+          - ''
+          - - 'https://github.com/'
+            - !Ref GitHubUser
+            - '/'
+            - !Ref GitHubRepositoryName2
+        Type:  GITHUB
+        BuildSpec: 04codebuild/readyapi-buildspec.yml
+      TimeoutInMinutes: 10
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${AWS::StackName}-readyapi-project
 
+
+
+
+  #code build - api testing using readyapi maven to execute Postman test def (see buildspec.yml)
   PetStoreAPIPipeline:
     Type: "AWS::CodePipeline::Pipeline"
     DependsOn:
@@ -335,7 +382,7 @@ Resources:
           RunOrder: 2
 
       # https://docs.aws.amazon.com/codepipeline/latest/userguide/actions-invoke-lambda-function.html
-      - Name: Test
+      - Name: PostmanTest
         Actions:
         - Name: TestPetStoreAPI
           ActionTypeId:
@@ -350,6 +397,24 @@ Resources:
           OutputArtifacts:
             - Name: 'PetStoreAPI-TestArtifact'
           RunOrder: 1
+
+
+        # added this section to try and get restassured tests running in  pipeline
+      - Name: RestAssuredTest
+        Actions:
+          - Name: TestRestAssuredProject
+            ActionTypeId:
+              Owner: AWS
+              Category: Build
+              Version: 1
+              Provider: CodeBuild
+            Configuration:
+              ProjectName: !Ref RestAssuredCodeBuildProject #add something here
+            InputArtifacts:
+              - Name: 'PetStoreAPI-SourceArtifact'
+            OutputArtifacts:
+              - Name: 'PetStoreAPI-TestArtifact'
+            RunOrder: 1
 
   PetStorePostmanPipelineRunnerRole:
     Type: AWS::IAM::Role
