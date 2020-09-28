@@ -21,11 +21,11 @@ Parameters:
     Description: bucket containing project artifacts e.g. postman config files, etc.
     MinLength: 1
     MaxLength: 100
-    GitHubRepositoryName2:
-      Type: String
-      Description: GitHub repository name for readyapi project.
-      MinLength: 1
-      MaxLength: 100
+  GitHubRepositoryName2:
+    Type: String
+    Description: GitHub repository name for readyapi project.
+    MinLength: 1
+    MaxLength: 100
 
 Resources:
 
