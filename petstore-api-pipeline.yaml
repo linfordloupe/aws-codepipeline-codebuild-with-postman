@@ -323,6 +323,25 @@ Resources:
           - Name: 'PetStoreAPI-SourceArtifact'
           RunOrder: 1
 
+      - Name: Source RestAssured
+        Actions:
+          - Name: CheckoutPetStoreAPISource
+            ActionTypeId:
+              Owner: ThirdParty
+              Category: Source
+              Version: 1
+              Provider: GitHub
+            Configuration:
+              Owner: !Ref GitHubUser
+              PollForSourceChanges: false
+              Repo: !Ref GitHubRepositoryName2
+              Branch: !Ref GitHubBranch
+              OAuthToken: !Ref GitHubToken
+            InputArtifacts: []
+            OutputArtifacts:
+              - Name: 'PetStoreAPI-SourceArtifact2'
+            RunOrder: 1
+
       - Name: Build
         Actions:
         - Name: BuildPetStoreAPI
@@ -407,7 +426,7 @@ Resources:
             Configuration:
               ProjectName: !Ref RestAssuredCodeBuildProject #add something here
             InputArtifacts:
-              - Name: 'PetStoreAPI-SourceArtifact'
+              - Name: 'PetStoreAPI-SourceArtifact2'
             OutputArtifacts:
               - Name: 'PetStoreAPI-TestArtifact-ReadyAPI'
             RunOrder: 1
