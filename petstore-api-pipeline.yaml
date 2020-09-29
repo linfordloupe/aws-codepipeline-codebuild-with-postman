@@ -406,7 +406,8 @@ Resources:
               Provider: CodeBuild
             Configuration:
               ProjectName: !Ref RestAssuredCodeBuildProject #add something here
-            InputArtifacts: []
+            InputArtifacts:
+              - Name: 'PetStoreAPI-SourceArtifact'
             OutputArtifacts:
               - Name: 'PetStoreAPI-TestArtifact-ReadyAPI'
             RunOrder: 1
