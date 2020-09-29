@@ -323,24 +323,22 @@ Resources:
           - Name: 'PetStoreAPI-SourceArtifact'
           RunOrder: 1
 
-      - Name: SourceRestAssured
-        Actions:
-          - Name: CheckoutPetStoreAPISource
-            ActionTypeId:
-              Owner: ThirdParty
-              Category: Source
-              Version: 1
-              Provider: GitHub
-            Configuration:
-              Owner: !Ref GitHubUser
-              PollForSourceChanges: false
-              Repo: !Ref GitHubRepositoryName2
-              Branch: !Ref GitHubBranch
-              OAuthToken: !Ref GitHubToken
-            InputArtifacts: []
-            OutputArtifacts:
-              - Name: 'PetStoreAPI-SourceArtifact2'
-            RunOrder: 1
+        - Name: CheckoutRestAssuredTests
+          ActionTypeId:
+            Owner: ThirdParty
+            Category: Source
+            Version: 1
+            Provider: GitHub
+          Configuration:
+            Owner: !Ref GitHubUser
+            PollForSourceChanges: false
+            Repo: !Ref GitHubRepositoryName2
+            Branch: !Ref GitHubBranch
+            OAuthToken: !Ref GitHubToken
+          InputArtifacts: []
+          OutputArtifacts:
+            - Name: 'PetStoreAPI-SourceArtifact2'
+          RunOrder: 2
 
       - Name: Build
         Actions:
