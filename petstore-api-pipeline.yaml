@@ -26,7 +26,7 @@ Parameters:
     Description: GitHub repository name for readyapi project.
     MinLength: 1
     MaxLength: 100
-
+ƒ
 Resources:
 
   CodePipelineTrustRole:
@@ -284,15 +284,12 @@ Resources:
             - '/'
             - !Ref GitHubRepositoryName2
         Type:  GITHUB
-        BuildSpec: 04codebuild/readyapi-buildspec.yml
+        BuildSpec: 04readyapi/readyapi-buildspec.yml
       TimeoutInMinutes: 10
       Tags:
         - Key: Name
           Value:
             Fn::Sub: ${AWS::StackName}-readyapi-project
-
-
-
 
   #code build - api testing using readyapi maven to execute Postman test def (see buildspec.yml)
   PetStoreAPIPipeline:
@@ -398,7 +395,6 @@ Resources:
             - Name: 'PetStoreAPI-TestArtifact'
           RunOrder: 1
 
-
         # added this section to try and get restassured tests running in  pipeline
       - Name: RestAssuredTest
         Actions:
@@ -413,7 +409,7 @@ Resources:
             InputArtifacts:
               - Name: 'PetStoreAPI-SourceArtifact'
             OutputArtifacts:
-              - Name: 'PetStoreAPI-TestArtifact'
+              - Name: 'PetStoreAPI-TestArtifact-ReadyAPI'
             RunOrder: 1
 
   PetStorePostmanPipelineRunnerRole:
