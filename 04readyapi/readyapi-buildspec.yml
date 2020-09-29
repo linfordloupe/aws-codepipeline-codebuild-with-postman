@@ -10,7 +10,7 @@ phases:
       - chmod -R 755 .
 #      - export BUCKET=loupe-api-automation
       - cd ApiAutomation
-      - mvn -f /pom.xml clean test
+      - mvn -f pom.xml clean test
 #      - mvn package shade:shade -DskipTests=true
       - echo Build completed on `date`
 #      - sam package --template-file template.yml --s3-bucket $BUCKET --output-template-file packaged-template.yml --s3-prefix Packaged_Jars
