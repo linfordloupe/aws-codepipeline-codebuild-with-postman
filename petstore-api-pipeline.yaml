@@ -323,7 +323,7 @@ Resources:
           - Name: 'PetStoreAPI-SourceArtifact'
           RunOrder: 1
 
-      - Name: Source RestAssured
+      - Name: SourceRestAssured
         Actions:
           - Name: CheckoutPetStoreAPISource
             ActionTypeId:
