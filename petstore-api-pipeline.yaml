@@ -407,7 +407,7 @@ Resources:
             Configuration:
               ProjectName: !Ref RestAssuredCodeBuildProject #add something here
             InputArtifacts:
-              - Name: 'PetStoreAPI-SourceArtifact'
+              - Name: []
             OutputArtifacts:
               - Name: 'PetStoreAPI-TestArtifact-ReadyAPI'
             RunOrder: 1
