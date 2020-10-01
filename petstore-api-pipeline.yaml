@@ -327,7 +327,7 @@ Resources:
             - '/'
             - !Ref GitHubRepositoryName3
         Type:  GITHUB
-        BuildSpec: cucumber-java-sauce/src/test/resources/buildspec/selenium-buildspec.yml
+        BuildSpec: src/test/resources/buildspec/selenium-buildspec.yml
       TimeoutInMinutes: 10
       Tags:
         - Key: Name
