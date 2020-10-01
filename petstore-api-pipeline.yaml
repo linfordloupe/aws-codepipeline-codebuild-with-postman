@@ -23,7 +23,12 @@ Parameters:
     MaxLength: 100
   GitHubRepositoryName2:
     Type: String
-    Description: GitHub repository name for readyapi project.
+    Description: GitHub repository name for restassured project.
+    MinLength: 1
+    MaxLength: 100
+  GitHubRepositoryName3:
+    Type: String
+    Description: GitHub repository name for restassured project.
     MinLength: 1
     MaxLength: 100
 
@@ -291,6 +296,45 @@ Resources:
           Value:
             Fn::Sub: ${AWS::StackName}-readyapi-project
 
+  SeleniumSaceLabsCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name:
+        Fn::Sub: ${AWS::StackName}-selenium-project
+      Description: CodeBuild Project using maven cli to execute postman tests
+      ServiceRole:
+        Fn::GetAtt: [ CodeBuildServiceRole, Arn ]
+      Artifacts:
+        Type: S3
+        Location:
+          Ref: CodePipelineArtifactBucket
+        Name:
+          Fn::Sub: ${AWS::StackName}-selenium-project
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:2.0
+        EnvironmentVariables:
+          - Name: S3_BUCKET
+            Type: PLAINTEXT
+            Value:
+              Fn::Sub: ${BucketRoot}
+      Source:
+        Location: !Join
+          - ''
+          - - 'https://github.com/'
+            - !Ref GitHubUser
+            - '/'
+            - !Ref GitHubRepositoryName3
+        Type:  GITHUB
+        BuildSpec: cucumber-java-sauce/src/test/resources/buildspec/selenium-buildspec.yml
+      TimeoutInMinutes: 10
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${AWS::StackName}-selenium-project
+
+
   #code build - api testing using readyapi maven to execute Postman test def (see buildspec.yml)
   PetStoreAPIPipeline:
     Type: "AWS::CodePipeline::Pipeline"
@@ -339,6 +383,23 @@ Resources:
           OutputArtifacts:
             - Name: 'PetStoreAPI-SourceArtifact2'
           RunOrder: 2
+
+        - Name: CheckoutSeleniumTests
+          ActionTypeId:
+            Owner: ThirdParty
+            Category: Source
+            Version: 1
+            Provider: GitHub
+          Configuration:
+            Owner: !Ref GitHubUser
+            PollForSourceChanges: false
+            Repo: !Ref GitHubRepositoryName3
+            Branch: !Ref GitHubBranch
+            OAuthToken: !Ref GitHubToken
+          InputArtifacts: []
+          OutputArtifacts:
+            - Name: 'PetStoreAPI-SourceArtifact3'
+          RunOrder: 3
 
       - Name: Build
         Actions:
@@ -427,6 +488,22 @@ Resources:
               - Name: 'PetStoreAPI-SourceArtifact2'
             OutputArtifacts:
               - Name: 'PetStoreAPI-TestArtifact-ReadyAPI'
+            RunOrder: 1
+
+      - Name: seleniumtestsremote
+        Actions:
+          - Name: seleniumtestsremotesaucelabs
+            ActionTypeId:
+              Owner: AWS
+              Category: Build
+              Version: 1
+              Provider: CodeBuild
+            Configuration:
+              ProjectName: !Ref SeleniumSaceLabsCodeBuildProject #add something here
+            InputArtifacts:
+              - Name: 'PetStoreAPI-SourceArtifact3'
+            OutputArtifacts:
+              - Name: 'PetStoreAPI-TestArtifact-Selenium'
             RunOrder: 1
 
   PetStorePostmanPipelineRunnerRole:
