@@ -28,7 +28,7 @@ Parameters:
     MaxLength: 100
   GitHubRepositoryName3:
     Type: String
-    Description: GitHub repository name for restassured project.
+    Description: GitHub repository name for selenium project.
     MinLength: 1
     MaxLength: 100
 
@@ -301,7 +301,7 @@ Resources:
     Properties:
       Name:
         Fn::Sub: ${AWS::StackName}-selenium-project
-      Description: CodeBuild Project using maven cli to execute postman tests
+      Description: CodeBuild Project using maven cli to execute selenium tests
       ServiceRole:
         Fn::GetAtt: [ CodeBuildServiceRole, Arn ]
       Artifacts:
